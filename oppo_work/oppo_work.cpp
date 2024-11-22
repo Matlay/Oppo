@@ -13,7 +13,7 @@ struct PressureData {
 };
 
 ostream& operator<<(ostream& stream, const PressureData& data);
-static string extractData(const string& data, const string& regex);
+string extractData(const string& data, const string& regex);
 
 string extractData(const string& data, const string& regexStr) {
     regex regExp(regexStr);
@@ -43,14 +43,25 @@ int main() {
         return 1;
     }
 
+    int minPressure, maxPressure;
+    cout << "Enter minimum pressure: ";
+    cin >> minPressure;
+    cout << "Enter maximum pressure: ";
+    cin >> maxPressure;
+
     vector<PressureData> measurements;
     string s;
 
     while (getline(ist, s)) {
         try {
+            int pressure = stoi(extractData(s, R"(((^| )(\d+)( |$)))"));
+
+            if (pressure < minPressure || pressure > maxPressure) {
+                continue;
+            }
+
             string date = extractData(s, R"((\d{4}\.\d{2}\.\d{2}))");
             double height = stod(extractData(s, R"(((^| )\d+\.\d+($| )))"));
-            int pressure = stoi(extractData(s, R"(((^| )(\d+)( |$)))"));
 
             measurements.push_back({ date, height, pressure });
         }
@@ -61,6 +72,13 @@ int main() {
             cerr << "Error: Out of range value in line '" << s << "'" << endl;
         }
     }
+
+    sort(measurements.begin(), measurements.end(), [](const PressureData& a, const PressureData& b) {
+        if (a.pressure != b.pressure) {
+            return a.pressure < b.pressure;
+        }
+        return a.height < b.height;
+        });
 
     for (const auto& item : measurements) {
         cout << item << endl;

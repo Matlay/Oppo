@@ -32,6 +32,13 @@ ostream& operator<<(ostream& stream, const PressureData& data) {
     return stream;
 }
 
+bool comparePressureData(const PressureData& a, const PressureData& b) {
+    if (a.pressure != b.pressure) {
+        return a.pressure < b.pressure;
+    }
+    return a.height < b.height;
+}
+
 int main() {
     ifstream ist("in.txt");
     if (!ist) {
